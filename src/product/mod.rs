@@ -1,7 +1,6 @@
 pub struct Product {
     pub id: String,
     pub back_market_uuid: String,
-    pub back_market_slug: String,
     pub title: String,
 }
 
