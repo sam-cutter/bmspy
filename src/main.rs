@@ -9,12 +9,16 @@ struct Product {
     title: String,
 }
 
-struct ProductSnapshot {
+struct Snapshot {
     id: String,
     product: Product,
     grade: Grade,
-    available: bool,
-    price: Option<f64>,
+    availability: Availability,
+}
+
+enum Availability {
+    Available(f64),
+    NotAvailable,
 }
 
 enum Grade {
