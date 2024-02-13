@@ -4,7 +4,7 @@ pub struct Product {
 }
 
 impl Product {
-    pub fn new(url: &str) -> Result<Self, &str> {
+    pub fn from_url(url: &str) -> Result<Self, &str> {
         let back_market_uuid = match extract_back_market_uuid(url) {
             Ok(uuid) => uuid,
             Err(e) => return Err(e),
