@@ -98,12 +98,7 @@ pub fn extract_back_market_uuid(url: &str) -> Result<String, &str> {
 pub struct Snapshot {
     pub product: Product,
     pub grade: Grade,
-    pub availability: Availability,
-}
-
-pub enum Availability {
-    Available(f64),
-    NotAvailable,
+    pub price: Option<f32>,
 }
 
 pub enum Grade {
