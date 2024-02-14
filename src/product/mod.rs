@@ -1,8 +1,3 @@
-pub struct Product {
-    pub back_market_uuid: String,
-    pub title: String,
-}
-
 enum BackMarketUUIDExtractionError {
     InvalidURL,
     InvalidHostname,
@@ -21,6 +16,11 @@ impl BackMarketUUIDExtractionError {
     }
 }
 
+pub struct Product {
+    back_market_uuid: String,
+    title: String,
+}
+
 impl Product {
     pub fn from_url(url: &str) -> Result<Self, String> {
         let back_market_uuid = match Self::extract_back_market_uuid_from_url(url) {
@@ -35,6 +35,14 @@ impl Product {
             back_market_uuid,
             title,
         })
+    }
+
+    pub fn back_market_uuid(&self) -> &str {
+        &self.back_market_uuid
+    }
+
+    pub fn title(&self) -> &str {
+        &self.title
     }
 
     fn extract_back_market_uuid_from_url(
