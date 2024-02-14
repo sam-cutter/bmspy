@@ -3,11 +3,29 @@ pub struct Product {
     pub title: String,
 }
 
+enum BackMarketUUIDExtractionError {
+    InvalidURL,
+    InvalidHostname,
+    InvalidPattern,
+    InvalidUUID,
+}
+
+impl BackMarketUUIDExtractionError {
+    pub fn message(&self) -> &str {
+        match self {
+            Self::InvalidURL => "The URL is not valid. Make sure that the entire URL is copied and pasted.",
+            Self::InvalidHostname => "The URL does not seem to be a Back Market URL. Make sure that the URL is from Back Market.",
+            Self::InvalidPattern => "The URL does not seem to be a valid Back Market product URL. Make sure that the URL is copied from a product page.",
+            Self::InvalidUUID => "The URL does not seem to contain a valid Back Market product id. Make sure that the entire URL is copied.",
+        }
+    }
+}
+
 impl Product {
-    pub fn from_url(url: &str) -> Result<Self, &str> {
+    pub fn from_url(url: &str) -> Result<Self, String> {
         let back_market_uuid = match Self::extract_back_market_uuid_from_url(url) {
             Ok(uuid) => uuid,
-            Err(e) => return Err(e),
+            Err(e) => return Err(e.message().to_string()),
         };
 
         // TODO: Fetch the product title
@@ -19,19 +37,19 @@ impl Product {
         })
     }
 
-    fn extract_back_market_uuid_from_url(url: &str) -> Result<String, &str> {
-        // TODO: Enumerate the possible error messages
-
+    fn extract_back_market_uuid_from_url(
+        url: &str,
+    ) -> Result<String, BackMarketUUIDExtractionError> {
         // Ensure that the URL is valid
         let url = match url::Url::parse(url) {
             Ok(url) => url,
-            Err(_) => return Err("Unable to interpret product URL."),
+            Err(_) => return Err(BackMarketUUIDExtractionError::InvalidURL),
         };
 
         // Ensure that the URL contains a hostname
         let host = match url.host() {
             Some(host) => host.to_string(),
-            None => return Err("Invalid product URL hostname."),
+            None => return Err(BackMarketUUIDExtractionError::InvalidHostname),
         };
 
         // Accepted Back Market hostnames
@@ -64,18 +82,18 @@ impl Product {
 
         // If the hostname is not a valid Back Market hostname, return an error
         if !VALID_HOSTNAMES.contains(&host.as_str()) {
-            return Err("Invalid product URL hostname.");
+            return Err(BackMarketUUIDExtractionError::InvalidHostname);
         }
 
         // Collect the URL path segments
         let url_path_segments: Vec<&str> = match url.path_segments() {
             Some(segments) => segments.collect(),
-            None => return Err("Invalid product URL path."),
+            None => return Err(BackMarketUUIDExtractionError::InvalidPattern),
         };
 
         // Ensure that the URL matches the pattern of /{locale}/p/{slug}/{uuid}
         if url_path_segments.len() != 4 || url_path_segments[1] != "p" {
-            return Err("Invalid product URL pattern.");
+            return Err(BackMarketUUIDExtractionError::InvalidPattern);
         }
 
         let back_market_uuid = url_path_segments[3];
@@ -89,7 +107,7 @@ impl Product {
         // Ensure that the UUID matches the UUID regex
         match uuid_regex.is_match(back_market_uuid) {
             true => Ok(back_market_uuid.to_string()),
-            false => Err("Invalid product UUID."),
+            false => Err(BackMarketUUIDExtractionError::InvalidUUID),
         }
     }
 }
