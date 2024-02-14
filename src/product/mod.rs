@@ -1,6 +1,8 @@
 mod back_mareket_uuid_extractor;
+mod snapshot;
 
 use back_mareket_uuid_extractor::extract_back_market_uuid_from_url;
+pub use snapshot::Snapshot;
 
 pub struct Product {
     back_market_uuid: String,
@@ -29,26 +31,6 @@ impl Product {
 
     pub fn title(&self) -> &str {
         &self.title
-    }
-}
-
-pub struct Snapshot {
-    product: Product,
-    grade: Grade,
-    price: Option<f32>,
-}
-
-impl Snapshot {
-    pub fn product(&self) -> &Product {
-        &self.product
-    }
-
-    pub fn grade(&self) -> &Grade {
-        &self.grade
-    }
-
-    pub fn price(&self) -> &Option<f32> {
-        &self.price
     }
 }
 
