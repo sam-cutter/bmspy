@@ -1,4 +1,4 @@
-use crate::product::{Grade, Product};
+use super::{Grade, Product};
 
 pub struct Snapshot {
     product: Product,
