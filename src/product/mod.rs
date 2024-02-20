@@ -22,11 +22,14 @@ impl Product {
             Err(e) => return Err(e.message().to_string()),
         };
 
+        // TODO: Move this to a separate function
+        // TODO: Handle errors properly (using enumerations)
         let api_url = format!(
             "https://www.backmarket.co.uk/bm/product/{}/technical_specifications",
             back_market_uuid
         );
 
+        // TODO: Choose a better user agent
         let client = match reqwest::Client::builder()
             .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537")
             .build() {
