@@ -16,6 +16,34 @@ impl BackMarketUUIDExtractionError {
     }
 }
 
+// Accepted Back Market hostnames
+const VALID_HOSTNAMES: [&str; 24] = [
+    "www.backmarket.co.uk",
+    "backmarket.co.uk",
+    "www.backmarket.com",
+    "backmarket.com",
+    "www.backmarket.fr",
+    "backmarket.fr",
+    "www.backmarket.de",
+    "backmarket.de",
+    "www.backmarket.es",
+    "backmarket.es",
+    "www.backmarket.it",
+    "backmarket.it",
+    "www.backmarket.be",
+    "backmarket.be",
+    "www.backmarket.nl",
+    "backmarket.nl",
+    "www.backmarket.at",
+    "backmarket.at",
+    "www.backmarket.pt",
+    "backmarket.pt",
+    "www.backmarket.se",
+    "backmarket.se",
+    "www.backmarket.fi",
+    "backmarket.fi",
+];
+
 pub fn extract_back_market_uuid_from_url(
     url: &str,
 ) -> Result<String, BackMarketUUIDExtractionError> {
@@ -30,34 +58,6 @@ pub fn extract_back_market_uuid_from_url(
         Some(host) => host.to_string(),
         None => return Err(BackMarketUUIDExtractionError::InvalidHostname),
     };
-
-    // Accepted Back Market hostnames
-    const VALID_HOSTNAMES: [&str; 24] = [
-        "www.backmarket.co.uk",
-        "backmarket.co.uk",
-        "www.backmarket.com",
-        "backmarket.com",
-        "www.backmarket.fr",
-        "backmarket.fr",
-        "www.backmarket.de",
-        "backmarket.de",
-        "www.backmarket.es",
-        "backmarket.es",
-        "www.backmarket.it",
-        "backmarket.it",
-        "www.backmarket.be",
-        "backmarket.be",
-        "www.backmarket.nl",
-        "backmarket.nl",
-        "www.backmarket.at",
-        "backmarket.at",
-        "www.backmarket.pt",
-        "backmarket.pt",
-        "www.backmarket.se",
-        "backmarket.se",
-        "www.backmarket.fi",
-        "backmarket.fi",
-    ];
 
     // If the hostname is not a valid Back Market hostname, return an error
     if !VALID_HOSTNAMES.contains(&host.as_str()) {
