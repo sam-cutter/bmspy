@@ -37,9 +37,3 @@ impl Product {
         &self.title
     }
 }
-
-pub enum Grade {
-    Fair,
-    Good,
-    Excellent,
-}

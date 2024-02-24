@@ -1,4 +1,9 @@
-use super::{Grade, Product};
+use super::Product;
+pub enum Grade {
+    Fair,
+    Good,
+    Excellent,
+}
 
 pub struct Snapshot {
     product: Product,
