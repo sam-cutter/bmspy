@@ -11,11 +11,6 @@ const USER_AGENTS: [&str; 7] = [
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15"
 ];
 
-#[derive(Deserialize)]
-struct ApiResponse {
-    title: String,
-}
-
 fn random_user_agent() -> &'static str {
     let index = rand::thread_rng().gen::<usize>() % USER_AGENTS.len();
     USER_AGENTS[index]
@@ -37,6 +32,11 @@ impl TitleFetchingError {
             Self::Other => "Something went wrong. It might be an issue with Back Market. Try again later or contact support if the problem persists.",
         }
     }
+}
+
+#[derive(Deserialize)]
+struct ApiResponse {
+    title: String,
 }
 
 pub async fn fetch_title(back_market_uuid: &str) -> Result<String, TitleFetchingError> {
