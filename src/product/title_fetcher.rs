@@ -16,7 +16,7 @@ struct ApiResponse {
     title: String,
 }
 
-pub fn random_user_agent() -> &'static str {
+fn random_user_agent() -> &'static str {
     let index = rand::thread_rng().gen::<usize>() % USER_AGENTS.len();
     USER_AGENTS[index]
 }
