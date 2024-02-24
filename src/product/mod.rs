@@ -1,17 +1,13 @@
 mod back_mareket_uuid_extractor;
 mod snapshot;
+mod title_fetcher;
 
 use back_mareket_uuid_extractor::extract_back_market_uuid_from_url;
-use serde_derive::Deserialize;
 pub use snapshot::Snapshot;
+use title_fetcher::fetch_title;
 
 pub struct Product {
     back_market_uuid: String,
-    title: String,
-}
-
-#[derive(Deserialize)]
-struct ApiResponse {
     title: String,
 }
 
@@ -22,37 +18,10 @@ impl Product {
             Err(e) => return Err(e.message().to_string()),
         };
 
-        // TODO: Move this to a separate function
-        // TODO: Handle errors properly (using enumerations)
-        let api_url = format!(
-            "https://www.backmarket.co.uk/bm/product/{}/technical_specifications",
-            back_market_uuid
-        );
-
-        // TODO: Choose a better user agent
-        let client = match reqwest::Client::builder()
-            .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537")
-            .build() {
-            Ok(client) => client,
-            Err(_) => return Err("Failed to create client".to_string()),
+        let title = match fetch_title(back_market_uuid.as_str()).await {
+            Ok(title) => title,
+            Err(e) => return Err(e.message().to_string()),
         };
-
-        let response = match client
-            .get(&api_url)
-            .header("Accept-Language", "en-gb")
-            .send()
-            .await
-        {
-            Ok(res) => res,
-            Err(_) => return Err("Failed to send request".to_string()),
-        };
-
-        let api_response: ApiResponse = match response.json().await {
-            Ok(json) => json,
-            Err(_) => return Err("Failed to parse JSON".to_string()),
-        };
-
-        let title = api_response.title;
 
         Result::Ok(Product {
             back_market_uuid,
