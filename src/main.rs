@@ -1,4 +1,5 @@
 mod product;
+mod snapshot;
 
 #[tokio::main]
 async fn main() {
