@@ -1,9 +1,7 @@
 mod back_mareket_uuid_extractor;
-mod snapshot;
 mod title_fetcher;
 
 use back_mareket_uuid_extractor::extract_back_market_uuid_from_url;
-pub use snapshot::Snapshot;
 use title_fetcher::fetch_title;
 
 pub struct Product {
