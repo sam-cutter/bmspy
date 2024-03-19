@@ -1,5 +1,3 @@
-use product::Product;
-
 mod product;
 
 #[tokio::main]
@@ -11,5 +9,4 @@ async fn main() {
     let pool = sqlx::PgPool::connect(&database_url).await.expect("Failed to connect to pool.");
     
     sqlx::migrate!("./migrations").run(&pool).await.expect("Failed to run migrations");
-
 }
