@@ -36,4 +36,20 @@ impl Product {
     pub fn title(&self) -> &str {
         &self.title
     }
+
+    pub async fn track(&self, pool: &sqlx::PgPool) {
+        let back_market_uuid = self.back_market_uuid();
+        let title = self.title();
+
+        let rows_affected = sqlx::query!(
+            r#"
+            INSERT INTO products (back_market_uuid, title)
+            VALUES ($1, $2)
+            "#,
+            back_market_uuid,
+            title
+        )
+        .execute(pool)
+        .await;
+    }
 }
