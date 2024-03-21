@@ -1,3 +1,4 @@
+mod client;
 mod migrations;
 mod product;
 mod snapshot;
