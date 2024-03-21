@@ -58,7 +58,7 @@ const VALID_HOSTNAMES: [&str; 24] = [
     "backmarket.fi",
 ];
 
-pub fn extract_uuid_from_url(url: &str) -> Result<String, ProductCreationFromURLError> {
+fn extract_uuid_from_url(url: &str) -> Result<String, ProductCreationFromURLError> {
     // Ensure that the URL is valid
     let url = match url::Url::parse(url) {
         Ok(url) => url,
@@ -87,7 +87,7 @@ pub fn extract_uuid_from_url(url: &str) -> Result<String, ProductCreationFromURL
         return Err(ProductCreationFromURLError::InvalidURL);
     }
 
-    let back_market_uuid = url_path_segments[3];
+    let uuid = url_path_segments[3];
 
     // Regex of a UUID
     let uuid_regex = regex::Regex::new(
@@ -96,8 +96,8 @@ pub fn extract_uuid_from_url(url: &str) -> Result<String, ProductCreationFromURL
     .unwrap();
 
     // Ensure that the UUID matches the UUID regex
-    match uuid_regex.is_match(back_market_uuid) {
-        true => Ok(back_market_uuid.to_string()),
+    match uuid_regex.is_match(uuid) {
+        true => Ok(uuid.to_string()),
         false => Err(ProductCreationFromURLError::InvalidURL),
     }
 }
@@ -118,15 +118,16 @@ fn random_user_agent() -> &'static str {
 }
 
 #[derive(Deserialize)]
-struct ApiResponse {
+struct TitleFetchAPIResponse {
     title: String,
 }
 
-pub async fn fetch_title(back_market_uuid: &str) -> Result<String, ProductCreationFromURLError> {
-    let api_url = format!(
-        "https://www.backmarket.co.uk/bm/product/{back_market_uuid}/technical_specifications",
-    );
+async fn fetch_title(uuid: &str) -> Result<String, ProductCreationFromURLError> {
+    // Format the API URL
+    let api_url =
+        format!("https://www.backmarket.co.uk/bm/product/{uuid}/technical_specifications",);
 
+    // Create a client to make the API request using a random user agent
     let client = match reqwest::Client::builder()
         .user_agent(random_user_agent())
         .build()
@@ -135,6 +136,7 @@ pub async fn fetch_title(back_market_uuid: &str) -> Result<String, ProductCreati
         Err(_) => return Err(ProductCreationFromURLError::TitleFetchingError),
     };
 
+    // Make the API request to fetch the product title
     let response = match client
         .get(&api_url)
         .header("Accept-Language", "en-gb")
@@ -145,13 +147,15 @@ pub async fn fetch_title(back_market_uuid: &str) -> Result<String, ProductCreati
         Err(_) => return Err(ProductCreationFromURLError::TitleFetchingError),
     };
 
+    // Check if the API request was successful
     match response.status() {
         reqwest::StatusCode::OK => (),
         reqwest::StatusCode::NOT_FOUND => return Err(ProductCreationFromURLError::InvalidURL),
         _ => return Err(ProductCreationFromURLError::TitleFetchingError),
     }
 
-    let response: ApiResponse = match response.json().await {
+    // Map API response to a struct in order to extract the title
+    let response: TitleFetchAPIResponse = match response.json().await {
         Ok(json) => json,
         Err(_) => return Err(ProductCreationFromURLError::TitleFetchingError),
     };
