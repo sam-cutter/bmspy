@@ -1,4 +1,5 @@
 mod from_url;
+mod tracked;
 
 pub struct Product {
     uuid: String,
