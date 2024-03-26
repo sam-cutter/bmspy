@@ -1,5 +1,9 @@
 use super::Product;
+use crate::client;
+use regex::Regex;
+use reqwest::StatusCode;
 use serde_derive::Deserialize;
+use url::Url;
 
 impl Product {
     pub async fn from_url(url: &str) -> Result<Self, ProductCreationFromURLError> {
@@ -59,7 +63,7 @@ const VALID_HOSTNAMES: [&str; 24] = [
 
 fn extract_uuid_from_url(url: &str) -> Result<String, ProductCreationFromURLError> {
     // Ensure that the URL is valid
-    let url = match url::Url::parse(url) {
+    let url = match Url::parse(url) {
         Ok(url) => url,
         Err(_) => return Err(ProductCreationFromURLError::InvalidURL),
     };
@@ -89,10 +93,9 @@ fn extract_uuid_from_url(url: &str) -> Result<String, ProductCreationFromURLErro
     let uuid = url_path_segments[3];
 
     // Regex of a UUID
-    let uuid_regex = regex::Regex::new(
-        r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
-    )
-    .unwrap();
+    let uuid_regex =
+        Regex::new(r"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
+            .unwrap();
 
     // Ensure that the UUID matches the UUID regex
     match uuid_regex.is_match(uuid) {
@@ -111,7 +114,7 @@ async fn fetch_title(uuid: &str) -> Result<String, ProductCreationFromURLError> 
     let api_url =
         format!("https://www.backmarket.co.uk/bm/product/{uuid}/technical_specifications",);
 
-    let client = match crate::client::client() {
+    let client = match client::client() {
         Ok(client) => client,
         Err(_) => return Err(ProductCreationFromURLError::TitleFetchingError),
     };
@@ -129,8 +132,8 @@ async fn fetch_title(uuid: &str) -> Result<String, ProductCreationFromURLError> 
 
     // Check if the API request was successful
     match response.status() {
-        reqwest::StatusCode::OK => (),
-        reqwest::StatusCode::NOT_FOUND => return Err(ProductCreationFromURLError::InvalidURL),
+        StatusCode::OK => (),
+        StatusCode::NOT_FOUND => return Err(ProductCreationFromURLError::InvalidURL),
         _ => return Err(ProductCreationFromURLError::TitleFetchingError),
     }
 
